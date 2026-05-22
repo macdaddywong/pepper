@@ -1,0 +1,9 @@
+qicli call ALMotion.wakeUp
+qicli call ALTextToSpeech.say "Hello but in VS CODE"
+
+$response = ollama run qwen2.5-coder:7b "Give me a one sentence greeting for Leroy"
+ssh nao@10.2.166.8 "qicli call ALTextToSpeech.say '$response'"
+
+
+
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass

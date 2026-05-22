@@ -1,0 +1,6 @@
+*=*.cs
+*.meta
+/venv
+__pycache__/
+provided Scripts/
+*.pyc
