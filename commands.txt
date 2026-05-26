@@ -7,3 +7,5 @@ ssh nao@10.2.166.8 "qicli call ALTextToSpeech.say '$response'"
 
 
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+
+just say "test"

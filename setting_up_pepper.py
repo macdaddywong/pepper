@@ -6,7 +6,7 @@ from pepper.pepper import Pepper
 
 class1 = ["jhonny", "julius", "sophie", "rosa", "zoe", "jackie", "andrew"]
 
-def setup()->"Pepper":
+def setup(set_up_json:bool=False)->"Pepper":
     try:
         print(f"1. building bot...")
         bot = Chatbot()
@@ -20,10 +20,13 @@ def setup()->"Pepper":
         print(f"4. building Pepper...")
         pepper = Pepper(classrooms=classrooms, memories=memory, chatbot=bot)
 
-        print(f"5. building database...")
-        pepper.build_json()
-
-        print(f"set up process successful")
+        # print(f"5. building database...")
+        # pepper.build_json()
+        print("Structure check")
+        m = pepper.memories.memories
+        print(m['brain']['name'])
+        print(m['brain']['teachers'])
+        print(f"set up process successful: {pepper.memories.memories['id']}")
         return pepper
     except Exception as ex:
         print(f"ERRORS detected: {ex}")

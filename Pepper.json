@@ -1,11 +1,48 @@
 {
-    "id": "cfa99a59-70ef-484d-9d99-63f14db93460",
+    "id": "99aa4072-f791-445d-acd4-eb662436564d",
     "brain": {
         "name": "Pepper the bot",
         "teachers": [],
+        "classes": {
+            "students": [
+                {
+                    "period_1": [
+                        "jhonny",
+                        "julius",
+                        "sophie",
+                        "rosa",
+                        "zoe",
+                        "jackie",
+                        "andrew"
+                    ]
+                }
+            ]
+        },
+        "student_assignments": [],
         "memories": [],
-        "chat_history": [],
-        "date_of_activation": "2026-05-26 15:37:03.265035+00:00",
+        "chat_history": [
+            {
+                "summary": "The user initiated a chat by typing 'just say the word \"test\"' and the response was simply 'Test'. This interaction is brief and lacks context or depth.",
+                "emotion": "Neutral",
+                "rating": 1
+            },
+            {
+                "summary": "The user initiated a chat by saying 'HI!', expecting an immediate response. The responder greeted back with a friendly 'Hi!' and asked how they could help, showing openness to assisting the user.",
+                "emotion": "Friendly",
+                "rating": 5
+            },
+            {
+                "summary": "The user describes a scenario where they have identified a student cheating on an exam and proposes a dramatic response involving a grand spectacle of justice. The user suggests gathering evidence, having a grand entrance by the main character (likely the narrator), and then presenting the evidence to the school board with a call for redemption.",
+                "emotion": "Enthusiasm mixed with superiority",
+                "rating": 5
+            },
+            {
+                "summary": "The user asked about bio-chemistry and its logic. The response provided a detailed explanation of bio-chemistry, comparing it to an intricate dance of life processes. The interaction had an informative tone with a hint of challenge or encouragement for deeper study.",
+                "emotion": "Enthusiastic",
+                "rating": 5
+            }
+        ],
+        "date_of_activation": "2026-05-26T17:51:01.046326+00:00",
         "core": ""
     }
 }

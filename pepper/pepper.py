@@ -78,8 +78,8 @@ class Pepper:
         self.classrooms.add_teacher(teacher)
 
     def add_class(self, period:int, list_of_students:List[str]):
-        self.classrooms.add_class(period, list_of_students=list_of_students)
-        self.memories.add_class()
+        cl = self.classrooms.add_class(period, list_of_students=list_of_students)
+        self.memories.add_class(cl)
 
     def remove_classroom(self, period:int):
         self.classrooms.remove_class(period)
@@ -125,8 +125,15 @@ class Pepper:
 
                 print(f"[pepper]: \n\t\u2022{response}\n\n")
                 print(f"[pepper (parsed)]: \n\t\u2022{parse}")
+
+                print("creating summary...")
                 summary = self.chatbot.summary_of_chat({"user":user, "response": response})
-                self.memories['chat_history'].append(summary['summary'])
+
+                print(f"summary: {summary['summary']}\n")
+                print("adding summary to memory")
+                self.memories.add_to_chat_history(summary['summary'])
+                print("memory process done, saving changes")
+                self.commit()
 
         except Exception as ex:
             print(f"ERROR: \n\t\u2022{ex}")

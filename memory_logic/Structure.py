@@ -14,11 +14,13 @@ class Structure:
             "brain": {
                 "name": "Pepper the bot",
                 "teachers": [],
-                "classes":[],
-                "student_assignemnts":[],
+                "classes":{
+                    'students':[]
+                },
+                "student_assignments":[],
                 "memories": [],
                 "chat_history": [],
-                "date_of_activation":str(datetime.now(tz=timezone.utc)),
+                "date_of_activation":datetime.now(tz=timezone.utc).isoformat(),
                 "core": ""
             }
         }

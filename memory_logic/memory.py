@@ -1,12 +1,16 @@
 
 import json
+import os
 from .Structure import Structure
 from datetime import datetime, timezone
+
+
 class Memory:
     def __init__(self, Brain:None=None):
         """'Brain' is a future import of Julius's Psyche software"""
-        self.memories = {}
         self.file_name = "Pepper.json"
+        self.memories = None
+        self._load_json()
 
 
     def AI_add_to_memory(self, ai_summary:dict):
@@ -18,11 +22,11 @@ class Memory:
             
             }"""
         try:
-            self.memories["memories"].append(
+            self.memories['brain']["memories"].append(
                 {
                     "summary": ai_summary['summary'],
                     "mode": ai_summary["mode"],
-                    "date": datetime.now(timezone.utc)
+                    "date": datetime.now(timezone.utc).isoformat()
                 }
             )
             self.commit()
@@ -34,20 +38,26 @@ class Memory:
     def add_teacher(self, teacher:str):
         
         try:
-            self.memories[0]['brain']['teachers'].append(teacher)
+            if teacher in self.memories['brain']['teachers']:
+                print(f"teacher already inside database")
+                return
+            self.memories['brain']['teachers'].append(teacher)
             self.commit()
             print("SAVED TEACHER")
         except Exception as ex:
-            print(f"ERROR occured during adding memory process: {ex}") 
+            print(f"ERROR occured during adding teacher to memory process: {ex}") 
 
     def add_class(self, cl:dict):
         
         try:
-            self.memories[0]['brain']['classes'].append(cl)
+            if cl in self.memories['brain']['classes']['students']:
+                print(f"class and students already inside database")
+                return
+            self.memories['brain']['classes']['students'].append(cl)
             self.commit()
             print("SAVED CLASS")
         except Exception as ex:
-            print(f"ERROR occured during adding memory process: {ex}") 
+            print(f"ERROR occured during adding class to memory process: {ex}") 
 
     def add_assigment(self, assigment:dict):
         """{
@@ -59,23 +69,32 @@ class Memory:
 
         }"""
         try:
-            self.memories[0]['brain']['student_assignemnts'].append(assigment)
+            self.memories['brain']['student_assignments'].append(assigment)
             self.commit()
             print("SAVED ASSIGNMENT")
         except Exception as ex:
             print(f"ERROR occured during adding memory process: {ex}") 
    
     def _build_json(self):
-        import os
+
         data = Structure.build()
-        if os.path.exists(self.file_name):
-            return 
             
         with open(self.file_name, "w") as f:
             json.dump(data, f, indent=4)  # Added indent for readability
 
         self.memories = data
 
+    def _load_json(self):
+        if os.path.exists(self.file_name):
+            try:
+                with open(self.file_name, "r") as f:
+                    self.memories = json.load(f)
+                return
+            except json.JSONDecodeError:
+          
+                print("Corrupted memory file, resetting...")
+                
+        self._build_json()
 
     def commit(self) -> None:
         try:
@@ -86,5 +105,16 @@ class Memory:
             print(f"Failed to commit changes: {ex}")
             input("Press Enter to acknowledge and continue...")
 
+    def add_to_chat_history(self, info):
+        print(f"THE type of info in add_to_chat_history in memory.py: {type(info)}")
+        d = self.breakdown_dict(info)
+        self.memories['brain']['chat_history'].append(d)
+    
+    def breakdown_dict(self, thing:dict):
+        s = {}
+        for key, value in thing.items():
+            s[key] = value
+        return s
+    
     def _get_brain(self):
-        return self.memories[0]["brain"]
+        return self.memories["brain"]
