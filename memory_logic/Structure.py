@@ -5,18 +5,20 @@ import uuid
 from datetime import timezone, datetime
 
 
-class Stucture: 
-    def build(self, name)->Dict[str,Any]:
+class Structure: 
+    def build()->Dict[str,Any]:
 
 
         S = {
             "id":str(uuid.uuid4()),
             "brain": {
-                "name": name,
+                "name": "Pepper the bot",
                 "teachers": [],
+                "classes":[],
+                "student_assignemnts":[],
                 "memories": [],
                 "chat_history": [],
-                "date_of_activation":datetime.today(tz=timezone.utc),
+                "date_of_activation":str(datetime.now(tz=timezone.utc)),
                 "core": ""
             }
         }

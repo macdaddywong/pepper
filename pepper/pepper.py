@@ -70,12 +70,16 @@ class Pepper:
     def commit(self):
         self.memories.commit()
 
+    def build_json(self):
+        self.memories._build_json()
+
     # CLASSROOM LOGIC
     def add_teacher(self, teacher:str):
         self.classrooms.add_teacher(teacher)
 
     def add_class(self, period:int, list_of_students:List[str]):
         self.classrooms.add_class(period, list_of_students=list_of_students)
+        self.memories.add_class()
 
     def remove_classroom(self, period:int):
         self.classrooms.remove_class(period)
@@ -90,13 +94,14 @@ class Pepper:
 
 
 
-    def active(self):
+    def active(self, speak:bool=True):
         """The loop of pepper being active"""
         self.state = States.ONLINE
         try:
             while True:
                 user = input("speak to pepper: ") 
                 if user.lower() in ["q", "quit"]:
+                    self.state = States.OFFLINE
                     self.exit_text()
                     break
                 if user.lower() in ["see modes", "see mode"]:
@@ -114,17 +119,21 @@ class Pepper:
                 pepper = self.chatbot.simple_chat(user)
                 response = pepper["response"]
                 parse = pepper["parsed"]
-                self.chatbot.ask_pepper_to_speak(response)
+
+                if speak:
+                    self.chatbot.ask_pepper_to_speak(response)
+
                 print(f"[pepper]: \n\t\u2022{response}\n\n")
                 print(f"[pepper (parsed)]: \n\t\u2022{parse}")
                 summary = self.chatbot.summary_of_chat({"user":user, "response": response})
                 self.memories['chat_history'].append(summary['summary'])
-                
+
         except Exception as ex:
             print(f"ERROR: \n\t\u2022{ex}")
             user = input("Keep going? (Y/N)")
 
             if user.lower().strip() != 'y':
+                self.state = States.OFFLINE
                 return
             self.active()
             

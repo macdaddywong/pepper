@@ -32,7 +32,7 @@ class Classrooms:
         new_class = {
             f"period_{period}": [i for i in list_of_students]
         }
-        user = input(f"CLASS {period}, is this correct?: \n\t\u2022{new_class}")
+        user = input(f"CLASS {period}, is this correct? (Y/N): \n\t\u2022{new_class} ")
         user = user.strip().lower()
         if user != "y":
             print('please insert correct students names')
@@ -49,6 +49,7 @@ class Classrooms:
                 if more != "y":
                     break
                 continue
+        return new_class
             
     def remove_class(self, period:int):
         self._period_check(period)
@@ -77,6 +78,7 @@ class Classrooms:
         if not Class:
             raise ValueError("Class not found")
         self.students_periods[c] = Class.append(student)
+        return student
 
     def remove_student(self, student:str, period:int=0):
         """Period isnt required as the system auto detects if you're not certain"""
@@ -103,6 +105,7 @@ class Classrooms:
             print("Teacher is already inside system")
             return
         self.teachers.append(teacher)
+        return teacher
 
     def remove_teacher(self, teacher:str):
         check = self.teachers(teacher)
@@ -110,6 +113,7 @@ class Classrooms:
             print("Teacher is not inside system")
             return
         self.teachers.remove(teacher)
+
 
     def _period_check(self, period):
         if period < 0 or period > 7:

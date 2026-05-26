@@ -16,6 +16,7 @@ class Chatbot:
                  ):
         model = model.lower().strip()
         self.model = model
+        self.prompts = Prompts()
         m = self.get_actions(mode)
         self.mode:str = m
         self.mode2:Optional[str] = None
@@ -171,7 +172,7 @@ class Chatbot:
     def summary_of_chat(self, interaction:dict):
         """interaction = {"user": user text, "response": ai respose}"""
 
-        summary = self.engine._generate(_identity=Prompts.summary(), prompt=interaction)
+        summary = self.engine._generate(_identity=self.prompts.summary(), prompt=interaction)
         parsed = self.engine._parse_json(summary)
         return {"summary": summary, "parsed": parsed}
 

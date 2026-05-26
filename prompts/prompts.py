@@ -4,10 +4,6 @@
 
 
 class Prompts:
-    def __init__(self):
-        pass
-
-
     def summary(self)->str:
         return """
         
@@ -24,9 +20,9 @@ class Prompts:
         
         
         
-        """
+        """.strip()
 
-    def causal(self,modes:tuple):
+    def causal(self, modes:tuple):
         causal_prompt = """
         
         
@@ -40,5 +36,5 @@ class Prompts:
 
 
 
-    def teaching_ass(self):
+    def teaching_(self):
         pass

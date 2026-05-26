@@ -1,6 +1,6 @@
 
 import json
-from .stucture import Stucture
+from .Structure import Structure
 from datetime import datetime, timezone
 class Memory:
     def __init__(self, Brain:None=None):
@@ -9,7 +9,7 @@ class Memory:
         self.file_name = "Pepper.json"
 
 
-    def add_to_memory(self, ai_summary:dict):
+    def AI_add_to_memory(self, ai_summary:dict):
         """ai_summary = {
         
             "summary": "pepper summary",
@@ -26,26 +26,65 @@ class Memory:
                 }
             )
             self.commit()
-            print("SAVED MEMORY")
+            print("SAVED SUMMARY")
         except Exception as ex:
             print(f"ERROR occured during adding memory process: {ex}") 
 
 
+    def add_teacher(self, teacher:str):
+        
+        try:
+            self.memories[0]['brain']['teachers'].append(teacher)
+            self.commit()
+            print("SAVED TEACHER")
+        except Exception as ex:
+            print(f"ERROR occured during adding memory process: {ex}") 
 
+    def add_class(self, cl:dict):
+        
+        try:
+            self.memories[0]['brain']['classes'].append(cl)
+            self.commit()
+            print("SAVED CLASS")
+        except Exception as ex:
+            print(f"ERROR occured during adding memory process: {ex}") 
 
+    def add_assigment(self, assigment:dict):
+        """{
+        
+            "title": title of the assignment,\n
+            "percentage_of_grade": percentage of grade it handles,\n
+            "assign_date": the date it was assigned,\n
+            "due": the date it is due
+
+        }"""
+        try:
+            self.memories[0]['brain']['student_assignemnts'].append(assigment)
+            self.commit()
+            print("SAVED ASSIGNMENT")
+        except Exception as ex:
+            print(f"ERROR occured during adding memory process: {ex}") 
+   
     def _build_json(self):
+        import os
+        data = Structure.build()
+        if os.path.exists(self.file_name):
+            return 
+            
         with open(self.file_name, "w") as f:
-            self.memories = json.dump(Stucture.build(), f)
+            json.dump(data, f, indent=4)  # Added indent for readability
 
+        self.memories = data
+
+
+    def commit(self) -> None:
+        try:
+            with open(self.file_name, "w") as f:
+                json.dump(self.memories, f, indent=4)
+        except Exception as ex:
+            # Avoid infinite loops; log the error and let the user acknowledge it once
+            print(f"Failed to commit changes: {ex}")
+            input("Press Enter to acknowledge and continue...")
 
     def _get_brain(self):
         return self.memories[0]["brain"]
-    
-    def commit(self)->None:
-        try:
-            with open(self.file_name, "w") as f:
-                json.dump(self.memories, f)
-        except Exception as ex:
-            while True:
-
-                hold = input(f"ERROR: {ex}")
