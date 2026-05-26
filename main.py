@@ -13,7 +13,7 @@ def handle(sig, frame):
 signal.signal(signal.SIGINT, handle)
 
 
-def test1():
+def chatting():
 
     bot = Chatbot()
     while True:
@@ -73,7 +73,7 @@ def exit_text():
 
 
 if __name__ in "__main__":
-    test1()
+    chatting()
 
 
 # Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass     

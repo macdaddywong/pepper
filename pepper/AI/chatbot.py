@@ -4,7 +4,7 @@ import ollama
 import subprocess
 from typing import Optional
 import random
-
+from prompts.prompts import Prompts
 
 class Chatbot:
     def __init__(self, 
@@ -25,18 +25,21 @@ class Chatbot:
 
         self.engine = Engine(backend=model, model_id=model_id, api_key=api_key)
 
-    def switch_mode(self, mode:str, mode2:str=""):
-        mode = mode.lower().strip()
+    def switch_second_mode(self, mode2:str):
+
         mode2 = mode2.lower().strip()
 
         
+        print(f"\nnew mode '{mode2}'")
+        self.mode2 = mode2
+
+
+
+    def switch_first_mode(self, mode:str):
+        mode = mode.lower().strip()
+
         print(f"\nnew mode '{mode}'")
         self.mode = mode
-
-        if mode2:
-        
-            print(f"new mode '{mode2}'")
-            self.mode2 = mode2
 
     def chat(self, prompt:str):
         """More advanced chating system, more slow. use 'simple_chat()' instead for quicker chats"""
@@ -49,7 +52,7 @@ class Chatbot:
             return {"response": response, "parsed": parsed}
         except Exception as ex:
             print(f"Error occured during process: {ex}")
-
+    
     def simple_chat(self, text):
         """Way quicker than chat, use this instead"""
         if self.mode2:
@@ -163,3 +166,12 @@ class Chatbot:
         ]
 
         subprocess.run(cmd)
+
+
+    def summary_of_chat(self, interaction:dict):
+        """interaction = {"user": user text, "response": ai respose}"""
+
+        summary = self.engine._generate(_identity=Prompts.summary(), prompt=interaction)
+        parsed = self.engine._parse_json(summary)
+        return {"summary": summary, "parsed": parsed}
+

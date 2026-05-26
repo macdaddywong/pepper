@@ -44,7 +44,7 @@ class Engine:
                 print("  Run: ollama pull qwen3:0.6b")
                 
              
-    def _generate(self,_identity:str, prompt:str,_use_ollama:bool=True) -> str:
+    def _generate(self,_identity:str, prompt:Any,_use_ollama:bool=True, send_json:bool=False) -> str:
         """Generate response from AI backend with persistent ROSA persona."""
     
     # Construct the message history with the system prompt at the top
@@ -81,11 +81,16 @@ class Engine:
             try:
                 import ollama
                 
-                response = ollama.chat(
-                    model=self.ollama_model,
-                    messages=messages,
-                    options={'temperature': 0.2}
-                )
+                kwargs = {
+                    'model': self.ollama_model,
+                    'messages': messages,
+                    'options': {'temperature': 0.2}
+                }
+
+                if send_json:
+                    kwargs['format'] = 'json'
+
+                response = ollama.chat(**kwargs)
                 return response['message']['content']
                 
             except Exception as e:
