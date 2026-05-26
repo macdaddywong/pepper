@@ -31,3 +31,25 @@ while 1:
     pygame.draw.circle(screen, white, (x,y), 8)
 
     pygame.display.flip()
+
+
+
+
+
+🔥 Step 6 — Next upgrades (this is where it gets interesting)
+
+Pick what you want next:
+
+🧠 1. Memory integration
+store every chat in JSON brain
+retrieve context per student
+📚 2. Class system UI
+sidebar pages (React Router)
+per-class chat rooms
+🎤 3. Voice mode (robot feel)
+speech-to-text input
+Pepper speaks back
+⚡ 4. Streaming responses
+word-by-word typing effect (real AI feel)
+🧩 5. Google Classroom sync
+pull assignments automatically

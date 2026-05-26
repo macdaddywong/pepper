@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pepper AI</title>
+<style>
+body {
+    margin: 0;
+    font-family: monospace;
+    background: #0b0f14;
+    color: #00ffcc;
+}
+
+.header {
+    padding: 15px;
+    border-bottom: 1px solid #00ffcc33;
+    font-size: 20px;
+}
+
+.chat {
+    height: calc(100vh - 130px);
+    overflow-y: auto;
+    padding: 15px;
+}
+
+.message {
+    margin: 10px 0;
+    padding: 10px;
+    border-left: 2px solid #00ffcc;
+}
+
+.user {
+    color: #ffffff;
+    border-left: 2px solid #ff4d4d;
+}
+
+.bot {
+    color: #00ffcc;
+}
+
+.input-area {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid #00ffcc33;
+}
+
+input {
+    flex: 1;
+    background: transparent;
+    border: 1px solid #00ffcc;
+    color: #00ffcc;
+    padding: 10px;
+}
+
+button {
+    margin-left: 10px;
+    background: #00ffcc;
+    border: none;
+    padding: 10px 15px;
+    color: black;
+    font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+<div class="header">🤖 PEPPER CORE SYSTEM</div>
+
+<div class="chat">
+    <div class="message bot">SYSTEM ONLINE</div>
+    <div class="message user">test</div>
+</div>
+
+<div class="input-area">
+    <input placeholder="Enter command...">
+    <button>RUN</button>
+</div>
+
+</body>
+</html>

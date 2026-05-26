@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pepper Chat</title>
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.header {
+    background: #222;
+    color: white;
+    padding: 15px;
+    font-size: 18px;
+}
+
+.chat {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+}
+
+.message {
+    margin: 10px 0;
+    padding: 10px 14px;
+    border-radius: 10px;
+    max-width: 60%;
+}
+
+.user {
+    background: #007bff;
+    color: white;
+    margin-left: auto;
+}
+
+.bot {
+    background: #e5e5e5;
+    color: black;
+}
+
+.input-area {
+    display: flex;
+    padding: 10px;
+    background: white;
+    border-top: 1px solid #ddd;
+}
+
+.input-area input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+.input-area button {
+    margin-left: 10px;
+    padding: 10px 15px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+    <div class="header">🤖 Pepper Chat</div>
+
+    <div class="chat">
+        <div class="message bot">Hello! I'm Pepper.</div>
+        <div class="message user">Hi</div>
+    </div>
+
+    <div class="input-area">
+        <input type="text" placeholder="Type a message...">
+        <button>Send</button>
+    </div>
+</div>
+</body>
+</html>
