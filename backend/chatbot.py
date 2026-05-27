@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from .config import app
+from .routes_links import APIs
 from pepper.AI.engine import Engine  # your existing class
 
 
@@ -9,7 +10,7 @@ engine = Engine()
 class ChatRequest(BaseModel):
     message: str
 
-@app.post("/chat")
+@app.post(APIs.CHAT)
 def chat(req: ChatRequest):
 
     response = engine._generate(

@@ -1,5 +1,5 @@
 
-from typing import Tuple, Any, TYPE_CHECKING
+from typing import Tuple, Any, TYPE_CHECKING, Union
 
 if TYPE_CHECKING:
     from memory_logic.memory import Memory
@@ -30,7 +30,7 @@ class Classrooms:
                 return
 
         new_class = {
-            f"period_{period}": [i for i in list_of_students]
+            f"period_{period}": [self.get_first_and_last_name(i) for i in list_of_students]
         }
         user = input(f"CLASS {period}, is this correct? (Y/N): \n\t\u2022{new_class} ")
         user = user.strip().lower()
@@ -50,7 +50,21 @@ class Classrooms:
                     break
                 continue
         return new_class
-            
+    
+    def get_first_and_last_name(self, student:Union[str,tuple]):
+        if isinstance(student, tuple):
+            # We are ignoring anything greater than 2
+            first_name = student[0]
+            last_name = student[1]
+            return first_name, last_name
+        
+        half = student.split()
+        if len(half) > 1:
+            # We are ignoring anything greater than 2
+            return half[0], half[1]
+        print("Just the first name")
+        return student, ""
+    
     def remove_class(self, period:int):
         self._period_check(period)
         self._class_exist(period)

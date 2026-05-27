@@ -2,34 +2,67 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Pepper Chat</title>
-<link rel="stylesheet" href="../css/styles.css">
-
-</link>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pepper — Admin Console</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/index.css">
 </head>
-
 <body>
 
-<div class="sidebar">
-    <h3>Pepper</h3>
-    <p>Memory</p>
-    <p>Classes</p>
-    <p>Settings</p>
+<!-- Header -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">Pφ</div>
+    <div class="logo-text">PEPPER <span>/ ADMIN</span></div>
+  </div>
+  <div class="header-right">
+    <div class="status-pill">
+      <div class="status-dot"></div>
+      ONLINE
+    </div>
+    <div class="header-id" id="instanceId">ID: —</div>
+  </div>
+</header>
+
+<div class="shell">
+
+  <!-- Sidebar -->
+  <nav>
+    <div class="nav-section">Core</div>
+    <div class="nav-item active" onclick="setPage('brain')" data-role="brain">
+      <span class="nav-icon">🧠</span> Brain
+    </div>
+    <div class="nav-item" onclick="setPage('students')" data-role="students">
+      <span class="nav-icon">👥</span> Students
+    </div>
+    <div class="nav-item" onclick="setPage('memory')" data-role="memory">
+      <span class="nav-icon">💾</span> Memory Log
+    </div>
+    <div class="nav-section">Classes</div>
+    <div class="nav-item" onclick="setPage('assignments')" data-role="assignments">
+      <span class="nav-icon">📋</span> Assignments
+    </div>
+    <div class="nav-item" onclick="setPage('periods')" data-role="periods">
+      <span class="nav-icon">🗂</span> Periods
+    </div>
+    <div class="nav-section">System</div>
+    <div class="nav-item" onclick="setPage('import')" data-role="import">
+      <span class="nav-icon">⬆</span> Import Brain
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <main id="mainContent">
+    <!-- Injected by JS -->
+  </main>
+
 </div>
 
-<div class="main">
-    <div class="header">Chat</div>
-
-    <div class="chat">
-        <div class="msg">Pepper: Hello student</div>
-        <div class="msg user">Hi</div>
-    </div>
-
-    <div class="input">
-        <input placeholder="Message Pepper...">
-        <button>Send</button>
-    </div>
-</div>
-
+<script type="module" src="../js/index.js">
+// ──────────────────────────────────────────────
+// Default brain data (matches your JSON shape)
+// ──────────────────────────────────────────────
+</script>
 </body>
 </html>
+
