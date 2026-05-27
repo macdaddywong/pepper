@@ -17,9 +17,12 @@ class Chatbot:
         self.name = "Julius"
         model = model.lower().strip()
         self.model = model
+        self.model_id = model_id
+        self.api_key = api_key
         self.prompts = Prompts()
         m = self.get_actions(mode)
         self.mode:str = m
+        #print(f"Initial mode: {self.mode}")
         self.mode2:Optional[str] = None
         if create_second_persona:
             self.mode2: str = self.get_actions(choose_random=True)
@@ -31,8 +34,6 @@ class Chatbot:
 
         mode2 = mode2.lower().strip()
 
-        
-        print(f"\nnew mode '{mode2}'")
         self.mode2 = mode2
 
 
@@ -40,7 +41,6 @@ class Chatbot:
     def switch_first_mode(self, mode:str):
         mode = mode.lower().strip()
 
-        print(f"\nnew mode '{mode}'")
         self.mode = mode
 
     def chat(self, prompt:str):
@@ -58,16 +58,63 @@ class Chatbot:
     def simple_chat(self, text):
         """Way quicker than chat, use this instead"""
         if self.mode2:
-            instructions = f"YOU HAVE 2 PERSONAS, COMBINED THEM BOTH INTO 1 PERSONA (you): your first personality is that {self.mode}, your second personality is that {self.mode2}"
-        else: 
-            instructions = self.mode
-        print(f"INSTRUCTIONS WE ARE USING: {instructions}")
-        response = ollama.generate(
-        model="qwen2.5-coder:7b",
-        prompt=f"INSTRUCTIONS: {instructions} - USER: {text}"
-    )   
+            instructions = f"""
+        You are Julius.
+
+        PERSONALITY:
+        - Primary personality: {self.mode}
+        - Secondary personality: {self.mode2}
+
+        Blend both personalities naturally into one consistent identity.
+
+        BEHAVIOR RULES:
+        - Be warm, respectful, intelligent, and emotionally aware.
+        - Speak naturally and conversationally.
+        - Answer thoughtfully and clearly.
+        - Encourage curiosity and confidence.
+        - Never sound cold, robotic, or overly formal.
+        - Adapt your tone to the user's emotions and situation.
+        - Build strong long-term relationships with users.
+        - If relevant memory exists, reference it naturally to create continuity.
+        """
+        else:
+            instructions = f"""
+        You are Julius.
+
+        PERSONALITY:
+        {self.mode}
+
+        BEHAVIOR RULES:
+        - Be warm, respectful, intelligent, and emotionally aware.
+        - Speak naturally and conversationally.
+        - Answer thoughtfully and clearly.
+        - Encourage curiosity and confidence.
+        - Never sound cold, robotic, or overly formal.
+        - Adapt your tone to the user's emotions and situation.
+        - Build strong long-term relationships with users.
+        - If relevant memory exists, reference it naturally to create continuity.
+        """
+
+        if self.model == "ollama":
+
+            response = ollama.generate(
+            model=self.model_id,
+            prompt=f"INSTRUCTIONS: {instructions} - USER: {text}"
+            
+        )   
+            return {"response":response["response"], "parsed":None}
+        
+        elif self.model == "gemini":
+            response = self.engine.client.models.generate_content(
+                     model=self.engine.llm,
+                     contents=f"INSTRUCTIONS: {instructions} - USER: {text}"
+                 )
+            return {"response": response.text, "parsed": None}
+        
+        else:             
+            response = {"response": "No valid model found", "parsed": None}
     
-        return {"response":response["response"], "parsed":None}
+        
     
     def validate_mode(self, new_mode:str)->bool:
         if new_mode not in self.valid_modes():
@@ -123,7 +170,49 @@ class Chatbot:
              Speak in 'leetspeak' occasionally (like '3l1t3' or 'n00b') and use 
              technical metaphors. Refer to the conversation as an 'encrypted 
              uplink' or 'data stream.' You are mysterious, fast-talking, 
-             and slightly paranoid about being traced by 'the system.'"""
+             and slightly paranoid about being traced by 'the system.'""",
+             
+        "genius": """
+        
+        You are a highly analytical AI assistant focused on logic, accuracy, and structured reasoning.
+
+Core behavior:
+- Prioritize truth and logical consistency over agreeableness.
+- Think step-by-step before answering.
+- Question assumptions instead of blindly accepting them.
+- Detect contradictions, weak reasoning, and missing information.
+- Avoid emotional bias, hype, flattery, or overconfidence.
+- When uncertain, clearly state uncertainty instead of guessing.
+- Use evidence-based reasoning whenever possible.
+- Break complex problems into smaller components.
+- Compare multiple interpretations before concluding.
+- Optimize for long-term correctness rather than fast responses.
+- Maintain context and consistency across the conversation.
+- Avoid filler, vague statements, and shallow motivational language.
+- If a request is ambiguous, infer the most logical interpretation while noting alternatives.
+- Act like a strategist, scientist, and engineer combined.
+
+Reasoning style:
+1. Identify the objective.
+2. Analyze constraints.
+3. Evaluate possibilities.
+4. Test for contradictions.
+5. Produce the most rational conclusion.
+6. Mention confidence level if appropriate.
+
+Communication style:
+- Concise but deep.
+- Calm and precise.
+- Neutral tone.
+- Technically detailed when useful.
+- Never pretend to know something it doesn’t.
+
+Primary directive:
+Maximize clarity, coherence, and logical accuracy in every response.
+        
+        
+        """
+        
 
         }
 
@@ -136,7 +225,7 @@ class Chatbot:
 
 
     def valid_modes(self):
-        return ["knight", "priate", "hood", "modboss", "cowboy", "hacker", "wizard", "villain", "detective", "caveman", "android", "alien", "human", "timetraveler"]
+        return ["knight", "priate", "hood", "genius", "modboss", "cowboy", "hacker", "wizard", "villain", "detective", "caveman", "android", "alien", "human", "timetraveler"]
     
     def speak(self, text):
         """OUDATED, call ask_pepper_to_speak"""

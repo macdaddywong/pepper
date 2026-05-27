@@ -140,7 +140,13 @@ class Engine:
         self.model_id = model_id
 
         if self.backend == 'gemini' and api_key:
-            print("gemini not implemented yet")
+            from google import genai
+            
+            
+            self.client = genai.Client(api_key=api_key)
+            self.llm = 'gemini-2.5-flash'
+            
+            print(f"✓ Gemini Backend Initialized: {self.client}")
 
         else:
             self.backend = 'ollama'
@@ -153,12 +159,124 @@ class Engine:
             except Exception:
                 print(f"⚠ Ollama model '{self.ollama_model}' not found")
                 print(f"Run: ollama pull {self.ollama_model}")
-
     def _generate(
         self,
         _identity: str,
         prompt: Any,
-        _use_ollama: bool = True,
+        _use_ollama: bool = False,
+        send_json: bool = False
+    ) -> Any:
+
+        # 1. Normalize prompt logic so both Ollama and Gemini handle histories/strings
+        # If it's a string representation of a dict/list, safely evaluate it
+        if isinstance(prompt, str) and (prompt.startswith('{') or prompt.startswith('[')):
+            try:
+                import ast
+                prompt = ast.literal_eval(prompt)
+            except Exception:
+                pass  # Keep as string if parsing fails
+
+        # Build standard messages list for Ollama
+        messages = [
+            {'role': 'system', 'content': _identity}
+        ]
+        
+        if isinstance(prompt, list):
+            for turn in prompt:
+                # Map custom keys ('user'/'response') to what LLMs expect
+                role = 'user' if 'user' in turn else 'assistant'
+                content = turn.get('user') or turn.get('response') or turn.get('content', '')
+                messages.append({'role': role, 'content': str(content)})
+        elif isinstance(prompt, dict):
+            # If it's a single dict turn like {'user': '...', 'response': '...'}
+            user_text = prompt.get('user', '')
+            response_text = prompt.get('response', '')
+            if user_text: messages.append({'role': 'user', 'content': str(user_text)})
+            if response_text: messages.append({'role': 'assistant', 'content': str(response_text)})
+        else:
+            messages.append({'role': 'user', 'content': str(prompt)})
+
+        # GEMINI BRANCH
+        if self.backend == 'gemini' and not _use_ollama:
+            try:
+                from google.genai import types
+
+                # Translate our cleaned messages list into Gemini SDK types.Content structures
+                gemini_contents = []
+                for msg in messages:
+                    if msg['role'] == 'system':
+                        continue # System instructions belong in the config, not contents
+                    
+                    # Convert 'assistant' back to Gemini's expected role string: 'model'
+                    gemini_role = 'model' if msg['role'] == 'assistant' else 'user'
+                    
+                    gemini_contents.append(
+                        types.Content(
+                            role=gemini_role,
+                            parts=[types.Part.from_text(text=msg['content'])]
+                        )
+                    )
+
+                print("BEFORE RESPONSES:", messages[:8])
+                response = self.client.models.generate_content(
+                    model=self.llm, 
+                    contents=gemini_contents, # Safely mapped objects!
+                    config=types.GenerateContentConfig( 
+                        system_instruction=_identity,
+                        response_mime_type="application/json" if send_json else None
+                    )
+                )
+                
+                return response.text or '[]'
+                
+            except Exception as e:
+                print(f"[engine.generate gemini] ⚠️ Gemini error: {e}")
+                if "503" in str(e):
+                    print("⚠️ Gemini service unavailable, switching to ollama, please hold...")
+                    self.backend = 'ollama'
+                    return self._generate(_identity, prompt, _use_ollama=True, send_json=send_json) 
+                return '[]'
+        
+        # OLLAMA BRANCH
+        else:
+            try:
+                import ollama
+                client = ollama.Client(timeout=60.0)
+
+                if send_json:
+                    messages[0]['content'] += "\nRespond ONLY with valid JSON."
+
+                # Convert roles to match what Ollama expects ('assistant', not 'model')
+                ollama_messages = []
+                for m in messages:
+                    role = 'assistant' if m['role'] == 'model' else m['role']
+                    ollama_messages.append({'role': role, 'content': m['content']})
+
+                kwargs = {
+                    'model': self.ollama_model,
+                    'messages': ollama_messages,
+                    'options': {'temperature': 0.2}
+                }
+
+                if send_json:
+                    kwargs['format'] = 'json'
+
+                response = client.chat(**kwargs)
+                content = response['message']['content']
+
+                if send_json:
+                    return self._parse_json(content, default={})
+
+                return content
+
+            except Exception as e:
+                print(f"⚠️ Ollama generation error: {e}")
+                return {} if send_json else ""
+    def _old_generate(
+        self,
+        _identity: str,
+        prompt: Any,
+        _use_ollama: bool = False,
         send_json: bool = False
     ) -> Any:
 
@@ -175,42 +293,62 @@ class Engine:
 
         # GEMINI
         if self.backend == 'gemini' and not _use_ollama:
-            print("Gemini not implemented")
-            return None
+            try:
+                from google.genai import types
 
-        # OLLAMA
-        try:
-            client = ollama.Client(timeout=60.0)
-
-            if send_json:
-                messages[0]['content'] += (
-                    "\nRespond ONLY with valid JSON."
+                print("BEFORE RESPONSES:", messages[:8])
+                response = self.client.models.generate_content(
+                    model=self.llm, 
+                    contents=prompt, # or whole history depends
+                    config=types.GenerateContentConfig( 
+                        system_instruction=_identity,
+                        response_mime_type="application/json" if send_json else None
+                    )
                 )
+                
+                
+                return response.text or '[]'
+            except Exception as e:
+                print(f"[engine.generate gemini] ⚠️ Gemini error: {e}")
+                if "503" in str(e):
+                    print("⚠️ Gemini service unavailable, switching to ollama, please hold...")
+                    self.backend = 'ollama'
+                    return self._generate(_identity, prompt, _use_ollama=True)  # Retry with Ollama
+                return '[]'
+        else:
+            # OLLAMA
+            try:
+                client = ollama.Client(timeout=60.0)
 
-            kwargs = {
-                'model': self.ollama_model,
-                'messages': messages,
-                'options': {
-                    'temperature': 0.2
+                if send_json:
+                    messages[0]['content'] += (
+                        "\nRespond ONLY with valid JSON."
+                    )
+
+                kwargs = {
+                    'model': self.ollama_model,
+                    'messages': messages,
+                    'options': {
+                        'temperature': 0.2
+                    }
                 }
-            }
 
-            if send_json:
-                kwargs['format'] = 'json'
+                if send_json:
+                    kwargs['format'] = 'json'
 
-            response = client.chat(**kwargs)
+                response = client.chat(**kwargs)
 
-            content = response['message']['content']
+                content = response['message']['content']
 
-            if send_json:
-                return self._parse_json(content, default={})
+                if send_json:
+                    return self._parse_json(content, default={})
 
-            return content
+                return content
 
-        except Exception as e:
-            print(f"⚠ Ollama generation error: {e}")
+            except Exception as e:
+                print(f"⚠ Ollama generation error: {e}")
 
-            return {} if send_json else ""
+                return {} if send_json else ""
 
     def _parse_json(
         self,

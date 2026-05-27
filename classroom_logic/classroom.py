@@ -5,12 +5,12 @@ if TYPE_CHECKING:
     from memory_logic.memory import Memory
 
 class Classrooms:
-    def __init__(self, memories:"Memory", ai, api_key="", Brain:None=None):
+    def __init__(self, memories:"Memory", Brain:None=None):
         """'Brain' is a future import of Julius's Psyche software"""
 
         self.summary_of_each_student:dict[str,list[str]] = {}
         """{"name of student: "summary of student"} """
-        self.teachers = []
+        self.teachers:list[str] = []
         self.students_periods:dict[str, list[str]] = {}
         """{"period number (e.q. period_4): "[list of students inside that period]"} """
 
@@ -32,8 +32,11 @@ class Classrooms:
         new_class = {
             f"period_{period}": [self.get_first_and_last_name(i) for i in list_of_students]
         }
-        user = input(f"CLASS {period}, is this correct? (Y/N): \n\t\u2022{new_class} ")
+        user = input(f"CLASS {period}, is this correct? (Y/N/Q): \n\t\u2022{new_class} ")
         user = user.strip().lower()
+        if user in ["q", "b", "quit", "0"]:
+            print("leaving classroom process")
+            return
         if user != "y":
             print('please insert correct students names')
             students = []
@@ -91,7 +94,7 @@ class Classrooms:
         Class = self.students_periods.get(c,None)
         if not Class:
             raise ValueError("Class not found")
-        self.students_periods[c] = Class.append(student)
+        self.students_periods[c] = Class.extend(student)
         return student
 
     def remove_student(self, student:str, period:int=0):
@@ -114,16 +117,15 @@ class Classrooms:
 
         
     def add_teacher(self, teacher:str):
-        check = self.teachers(teacher)
-        if check:
+        if teacher in self.teachers:
             print("Teacher is already inside system")
             return
         self.teachers.append(teacher)
         return teacher
 
     def remove_teacher(self, teacher:str):
-        check = self.teachers(teacher)
-        if not check:
+
+        if not teacher not in self.teachers:
             print("Teacher is not inside system")
             return
         self.teachers.remove(teacher)
@@ -136,7 +138,9 @@ class Classrooms:
     def _class_exist(self, period:int) -> bool:
         C = self.students_periods.get(f"period_{period}", None)
         if C is None:
-           raise ValueError(f"There is no period {period}")
+           print(f"There is no period {period}")
+           return False
+        return True
     
     def _student_in_database(self, student:str)->Tuple[bool, str]:
         student=student.lower().strip()
@@ -147,7 +151,7 @@ class Classrooms:
             return True, classroom
         return False, ""
     
-    def _teacher_in_database(self, teacher:str)->Tuple[bool, str]:
+    def _teacher_in_database(self, teacher:str)->bool:
         teacher = teacher.lower().strip()
         if teacher not in self.teachers:
             return False

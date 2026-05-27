@@ -4,3 +4,5 @@
 __pycache__/
 provided Scripts/
 *.pyc
+*.env
+keys.py

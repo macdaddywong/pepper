@@ -106,7 +106,8 @@ class Memory:
             input("Press Enter to acknowledge and continue...")
 
     def add_to_chat_history(self, info):
-        print(f"THE type of info in add_to_chat_history in memory.py: {type(info)}")
+        print(f"THE type of info in add_to_chat_history in memory.py: {type(info)}\n")
+        print(f"THE content of info in add_to_chat_history in memory.py: {info}")
         d = self.breakdown_dict(info)
         self.memories['brain']['chat_history'].append(d)
     

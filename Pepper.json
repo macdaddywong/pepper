@@ -47,7 +47,8 @@
                             ""
                         ]
                     ]
-                }
+                },
+                null
             ]
         },
         "student_assignments": [],
@@ -72,7 +73,10 @@
                 "summary": "The user asked about bio-chemistry and its logic. The response provided a detailed explanation of bio-chemistry, comparing it to an intricate dance of life processes. The interaction had an informative tone with a hint of challenge or encouragement for deeper study.",
                 "emotion": "Enthusiastic",
                 "rating": 5
-            }
+            },
+            {},
+            {},
+            {}
         ],
         "date_of_activation": "2026-05-26T17:51:01.046326+00:00",
         "core": ""
