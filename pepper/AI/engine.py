@@ -155,11 +155,16 @@ class Engine:
             try:
                 ollama.show(self.ollama_model)
                 print(f"✓ Using Ollama ({self.ollama_model})")
+            except:
+                try:
+                    self.ollama_model = "qwen3:0.6b"
+                    ollama.show(self.ollama_model)
+                    print(f"✓ Using Ollama ({self.ollama_model})")
 
-            except Exception:
-                print(f"⚠ Ollama model '{self.ollama_model}' not found")
-                print(f"Run: ollama pull {self.ollama_model}")
-    def _generate(
+                except Exception:
+                    print(f"⚠ Ollama model '{self.ollama_model}' not found")
+                    print(f"Run: ollama pull {self.ollama_model}")
+    def old_generate(
         self,
         _identity: str,
         prompt: Any,
@@ -272,14 +277,14 @@ class Engine:
             except Exception as e:
                 print(f"⚠️ Ollama generation error: {e}")
                 return {} if send_json else ""
-    def _old_generate(
+    def _generate(
         self,
         _identity: str,
         prompt: Any,
         _use_ollama: bool = False,
         send_json: bool = False
     ) -> Any:
-
+        print(f"INSIDE _GENERATE _identity: {_identity}")
         messages = [
             {
                 'role': 'system',
@@ -291,29 +296,62 @@ class Engine:
             }
         ]
 
-        # GEMINI
+        # GEMINI BRANCH
         if self.backend == 'gemini' and not _use_ollama:
             try:
                 from google.genai import types
 
-                print("BEFORE RESPONSES:", messages[:8])
+                # 1. Transform raw prompt history structures into Gemini SDK native types
+                gemini_contents = []
+
+                # Handle a list of historical turns
+                if isinstance(prompt, list):
+                    for turn in prompt:
+                        role = 'model' if 'response' in turn or turn.get('role') == 'assistant' else 'user'
+                        text_content = turn.get('user') or turn.get('response') or turn.get('content', '')
+                        if text_content:
+                            gemini_contents.append(
+                                types.Content(role=role, parts=[types.Part.from_text(text=str(text_content))])
+                            )
+                
+                # Handle a single turn dict: {'user': 'hi', 'response': '...'}
+                elif isinstance(prompt, dict):
+                    if 'user' in prompt:
+                        gemini_contents.append(
+                            types.Content(role='user', parts=[types.Part.from_text(text=str(prompt['user']))])
+                        )
+                    if 'response' in prompt:
+                        gemini_contents.append(
+                            types.Content(role='model', parts=[types.Part.from_text(text=str(prompt['response']))])
+                        )
+                
+                # Handle basic text strings
+                else:
+                    gemini_contents.append(
+                        types.Content(role='user', parts=[types.Part.from_text(text=str(prompt))])
+                    )
+
+                print("BEFORE RESPONSES: Cleaned and structured contents successfully.")
+
+                # 2. Fire the generation call with explicit configs
                 response = self.client.models.generate_content(
                     model=self.llm, 
-                    contents=prompt, # or whole history depends
+                    contents=gemini_contents,  # No more raw dicts!
                     config=types.GenerateContentConfig( 
                         system_instruction=_identity,
+                        # None completely omits the key so Gemini defaults to raw text
                         response_mime_type="application/json" if send_json else None
                     )
                 )
                 
-                
                 return response.text or '[]'
+
             except Exception as e:
                 print(f"[engine.generate gemini] ⚠️ Gemini error: {e}")
                 if "503" in str(e):
-                    print("⚠️ Gemini service unavailable, switching to ollama, please hold...")
+                    print("⚠️ Gemini service unavailable, switching to ollama...")
                     self.backend = 'ollama'
-                    return self._generate(_identity, prompt, _use_ollama=True)  # Retry with Ollama
+                    return self._generate(_identity, prompt, _use_ollama=True, send_json=send_json)
                 return '[]'
         else:
             # OLLAMA
@@ -324,7 +362,7 @@ class Engine:
                     messages[0]['content'] += (
                         "\nRespond ONLY with valid JSON."
                     )
-
+                
                 kwargs = {
                     'model': self.ollama_model,
                     'messages': messages,

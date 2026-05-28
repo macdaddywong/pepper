@@ -266,8 +266,20 @@ Maximize clarity, coherence, and logical accuracy in every response.
 
     def summary_of_chat(self, interaction:dict):
         """interaction = {"user": user text, "response": ai respose}"""
-
-        summary = self.engine._generate(_identity=self.prompts.summary(), prompt=interaction)
+        print(f"\n\n\n\nthe interation: {interaction}\n")
+        prompt = self.prompts.summary()
+        user = input(f"PROVIDED PROMPT: {prompt[:20]}, CONTINUE?")
+        if user not in ["y", "yes"]:
+            return
+        
+        summary = self.engine._generate(_identity=prompt, prompt=interaction, send_json=True)
+        print(f"Raw summary output: {summary}")
         parsed = self.engine._parse_json(summary)
+        print(f"Parsed summary output: {parsed}")
+        user = input(f"SUMMARY IS THIS VALID?:\n\t\u2022 {parsed}?")
+        if user not in ["y", "yes"]:
+            return
+        
+        
         return {"summary": parsed, "raw": summary}
 

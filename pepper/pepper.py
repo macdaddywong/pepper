@@ -51,7 +51,7 @@ class Pepper:
                         continue
                     if new_mode.lower().strip() in ["none", "0"]:
                         print("Node 2 being removed, to readd recall mode 2")
-                        self.chatbot.switch_second_mode(mode2=None)
+                        self.chatbot.switch_second_mode(mode2="")
                         return
                     
                     action = self.chatbot.get_actions(action=new_mode)
@@ -59,7 +59,7 @@ class Pepper:
                     break 
     # MEMORY LOGIC
     def add_memory(self, ai_sum:dict):
-        self.memories.add_to_memory(ai_summary=ai_sum)
+        self.memories.AI_add_to_memory(ai_summary=ai_sum)
 
     def add_to_json(self, what:Any):
         pass
@@ -87,8 +87,8 @@ class Pepper:
     def remove_student(self, student:str,):
         self.classrooms.remove_student(student)
 
-    def add_student(self, student:str):
-        self.classrooms.add_student(student=student)
+    def add_student(self, period, student:str):
+        self.classrooms.add_student(period=period, student=student)
 
 
 
