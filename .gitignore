@@ -6,3 +6,4 @@ provided Scripts/
 *.pyc
 *.env
 keys.py
+/test
