@@ -262,6 +262,8 @@ Maximize clarity, coherence, and logical accuracy in every response.
         ]
 
         subprocess.run(cmd)
+        
+    
 
 
     def summary_of_chat(self, interaction:dict):

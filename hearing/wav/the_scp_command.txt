@@ -1,0 +1,6 @@
+
+# REPLACE
+
+    scp nao@172.17.10.113:/home/nao/input.wav ~/Psyche/peppers_system/hearing/wav/input.wav
+
+# Create new

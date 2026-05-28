@@ -2,6 +2,7 @@
 import sys
 from typing import Any, TYPE_CHECKING, List
 import time
+from hearing.hearing import Hearing
 from states.Currentstate import States
 if TYPE_CHECKING:
     from .AI.chatbot import Chatbot
@@ -9,10 +10,16 @@ if TYPE_CHECKING:
     from classroom_logic.classroom import Classrooms
 
 class Pepper:
-    def __init__(self, classrooms:"Classrooms", memories:"Memory", chatbot:"Chatbot"):
+    def __init__(self, 
+                 classrooms:"Classrooms", 
+                 memories:"Memory", 
+                 chatbot:"Chatbot",
+                 only_ears:bool=False):
         self.classrooms = classrooms
         self.memories = memories
+        self._only_ears_ = only_ears
         self.chatbot = chatbot
+        self.ears = Hearing()
         self.state = States.OFFLINE
 
     # CHATBOT LOGIC
@@ -20,6 +27,9 @@ class Pepper:
         
         self.chatbot.ask_pepper_to_speak(prompt)
 
+    def listen(self, path="wav/input.wav"):
+        self.ears.listen(path=path)
+        
     def chat(self,prompt:str):
         self.chatbot.simple_chat(prompt)
 
@@ -93,10 +103,45 @@ class Pepper:
 
 
 
+    def _hear(self, speak:bool=True):
+        try:
+            while True:
+                print("=================================")
+                print("HEARING FOR USER INPUT TEST PHASE")
+                print("=================================\n")
+                keeping_going = input("keep going? (Y/N) ")
+                if keeping_going.lower().strip() not in ["y", 'yes', "keep going"]:
+                    break
+                self.ears.access_microphone()
+                user = self.ears.listen() 
+                if not user or user == ".":
+                    print("Heard nothing, restarting loop")
+                    continue
+                pepper = self.chatbot.simple_chat(user)
+                if not pepper:
+                    print(f"Pepper return nothing for text, please double check on this issue: {pepper if pepper else 'Pepper said nothing'}")
+                    break
+                response = pepper["response"]
+                parse = pepper["parsed"]
 
-    def active(self, speak:bool=True):
+                if speak:
+                    self.chatbot.ask_pepper_to_speak(response)
+
+                print(f"[pepper]: \n\t\u2022{response}\n\n")
+                print(f"[pepper (parsed)]: \n\t\u2022{parse}")
+        except Exception as ex:
+            print(f"There was an error during hearing process: {ex}\n")
+            input("please hit ENTER for knowledgement on the issue")
+            return
+    def active(self, speak:bool=True, use_ears:bool=False):
         """The loop of pepper being active"""
+        
         self.state = States.ONLINE
+        if self._only_ears_ or use_ears:
+            self._hear(speak=speak)
+            self.exit_text()
+            return
+        
         try:
             while True:
                 user = input("speak to pepper: ") 
@@ -114,7 +159,8 @@ class Pepper:
                 if user.lower() in ["mode2", "mode 2", "change mode2", "change mode 2"]:
                     self.change_second_mode_sequence()
                     continue
-
+                if not user:
+                    continue
                 print("GETTING CHAT...")
                 pepper = self.chatbot.simple_chat(user)
                 response = pepper["response"]
@@ -151,3 +197,24 @@ class Pepper:
         time.sleep(1)
         print("thanks for chatting!")
         sys.exit(0) 
+
+    def _user_text_sequence(self, user:str):
+        if user.lower() in ["q", "quit"]:
+            self.state = States.OFFLINE
+            self.exit_text()
+            exit(0)
+            
+        if user.lower() in ["see modes", "see mode"]:
+            self.see_modes()
+            return True
+        
+        if user.lower() in ["mode", "change mode"]:
+            self.change_first_mode_sequence()
+            return True
+
+        if user.lower() in ["mode2", "mode 2", "change mode2", "change mode 2"]:
+            self.change_second_mode_sequence()
+            return True
+                    
+        if not user:
+            return False
