@@ -47,7 +47,7 @@ class Memory:
         except Exception as ex:
             print(f"ERROR occured during adding teacher to memory process: {ex}") 
 
-    def add_class(self, cl:dict):
+    def add_class(self, cl): # dict
         
         try:
             if cl in self.memories['brain']['classes']['students']:

@@ -68,3 +68,4 @@ posture.goToPosture("StandInit", 0.5)
 sleep(2)
 
 posture.goToPosture("Crouch", 0.5)
+tts.setLanguage("English")

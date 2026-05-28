@@ -101,7 +101,8 @@ class Pepper:
         self.classrooms.add_student(period=period, student=student)
 
 
-
+    def change_language(self, language:str):
+        self.chatbot.change_language(language)
 
     def _hear(self, speak:bool=True):
         try:
@@ -112,11 +113,20 @@ class Pepper:
                 keeping_going = input("keep going? (Y/N) ")
                 if keeping_going.lower().strip() not in ["y", 'yes', "keep going"]:
                     break
-                self.ears.access_microphone()
+                
+                self.ears.turn_on_microphone()
                 user = self.ears.listen() 
                 if not user or user == ".":
                     print("Heard nothing, restarting loop")
                     continue
+                print(f"We were returned this as text:")
+                print("\n\t\u2022RAW:", user)
+                print("\n\t\u2022CLEAN:", self.ears.clean(user))
+                n = input("valid? (Y/N) ")
+                
+                if n.lower().strip() not in ['y', 'yes']:
+                    exit(0)
+                    
                 pepper = self.chatbot.simple_chat(user)
                 if not pepper:
                     print(f"Pepper return nothing for text, please double check on this issue: {pepper if pepper else 'Pepper said nothing'}")
@@ -133,6 +143,7 @@ class Pepper:
             print(f"There was an error during hearing process: {ex}\n")
             input("please hit ENTER for knowledgement on the issue")
             return
+        
     def active(self, speak:bool=True, use_ears:bool=False):
         """The loop of pepper being active"""
         

@@ -1,17 +1,26 @@
-from faster_whisper import WhisperModel
-from .hearing import Hearing
+# run_whisper.py
+from hearing import Hearing
+
+
 
 
 ears = Hearing()
-print(ears.listen())
-
 
 if __name__ == "__main__":
-    use_microphone = input("Use microphone?")
-    use_microphone = use_microphone.lower().strip()
-    if use_microphone not in ['y', 'yes', "use", "use_microphone", "use microphone"]:
-        exit(0)
+    # use_microphone = input("Use microphone?")
+    # use_microphone = use_microphone.lower().strip()
+    # if use_microphone not in ['y', 'yes', "use", "use_microphone", "use microphone"]:
+    #     exit(0)
         
-    ears.access_microphone()
+    ears.turn_on_microphone()
+    text = ears.listen()
+    print(f"We were returned this as text:")
+    print("\n\t\u2022RAW:", text)
+    print("\n\t\u2022CLEAN:", ears.clean(text))
+    n = input("valid? (Y/N) ")
+    
+    if n.lower().strip() not in ['y', 'yes']:
+        exit(0) 
+    
     
 

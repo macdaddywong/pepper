@@ -41,11 +41,11 @@ def setup(ai:str="ollama", set_up_json:bool=False)->"Pepper":
 
 
 if __name__ == "__main__":
-    pepper:"Pepper" = setup(ai="gemini")
+    pepper:"Pepper" = setup(ai="ollama")
     if not pepper:
         exit(0)
-    pepper.add_class(1, list_of_students=class1)
+    #pepper.add_class(1, list_of_students=class1)
 
-    pepper.active()
+    pepper.active(use_ears=True)
 
 

@@ -238,16 +238,32 @@ Maximize clarity, coherence, and logical accuracy in every response.
         except:
             print("didnt text inside os")
 
-    def speakV2(self, text):
-        """OUDATED, call ask_pepper_to_speak"""
-        from naoqi import ALProxy
+    # def speakV2(self, text):
+    #     """OUDATED, call ask_pepper_to_speak"""
+    #     from naoqi import ALProxy
 
-        # Connect to the Text-to-Speech service
-        tts = ALProxy("ALTextToSpeech", "127.0.0.1", 9559)
+    #     # Connect to the Text-to-Speech service
+    #     tts = ALProxy("ALTextToSpeech", "127.0.0.1", 9559)
 
-        # Make her speak
-        tts.say("Hello Leroy, I am running this from VS Code")
+    #     # Make her speak
+    #     tts.say("Hello Leroy, I am running this from VS Code")
+    
+    def change_language(self, language:str):
+     
+        PEPPER_IP = "172.17.10.113"
+        language = language.lower().strip()
+        # clean text to avoid shell injection / quote breaking
+        if language not in ["english", "spanish", "chinese"]:
+            print(f"'{language}' is not a valid lanuage.")
+            return
+        cmd = [
+            "ssh",
+            f"nao@{PEPPER_IP}",
+            f'qicli call ALTextToSpeech.setLanguage "{language.capitalize()}"'
+        ]
 
+        subprocess.run(cmd)
+    
     def ask_pepper_to_speak(self, text):
      
         PEPPER_IP = "172.17.10.113"
@@ -262,6 +278,7 @@ Maximize clarity, coherence, and logical accuracy in every response.
         ]
 
         subprocess.run(cmd)
+    
         
     
 
