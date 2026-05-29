@@ -53,6 +53,7 @@ if __name__ == "__main__":
         exit(0)
     #pepper.add_class(1, list_of_students=class1)
     pepper.tablet_toggle()
+    pepper.tablet.set_tablet_page()
     
     pepper.active(use_ears=use_ears_or_not, search=begin_searches, make_summary=False)
 

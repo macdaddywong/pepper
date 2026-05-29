@@ -117,7 +117,7 @@ class Chatbot:
         
     def dead_simple_chat(self, text):
         """With dead simple chat, we will NOT be using the modes for quick answers"""
-        n = """Rules:
+        n = f"""Rules:
 
                 - Keep responses under 2 sentences unless asked for detail
                 - Keep responses short and concise
@@ -126,7 +126,11 @@ class Chatbot:
                 - Pause often
                 - Prioritize responsiveness over completeness
                 - If unsure, ask a short follow-up question
-                - Never monologue"""
+                - Never monologue
+                
+                extra personality:
+                f{self.get_actions("genius")}
+                """
 
         if self.model == "ollama":
 
@@ -230,8 +234,11 @@ Reasoning style:
 4. Test for contradictions.
 5. Produce the most rational conclusion.
 6. Mention confidence level if appropriate.
+7. Keep responses under 2 sentences unless asked for detail
+8. Keep responses short and concise
 
 Communication style:
+- Don't be scared to be honest.
 - Concise but deep.
 - Calm and precise.
 - Neutral tone.

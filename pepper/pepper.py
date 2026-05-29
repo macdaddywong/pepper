@@ -6,6 +6,8 @@ import time
 from hearing.hearing import Hearing
 from .tablet.tablet import Tablet
 from states.Currentstate import States
+from Motion.motion import FollowingBuddy
+
 if TYPE_CHECKING:
     from .AI.chatbot import Chatbot
     from memory_logic.memory import Memory
@@ -28,12 +30,18 @@ class Pepper:
         self.table_on:bool = False
         self.state = States.OFFLINE
         self.tablet = Tablet(bot=chatbot)
+        self.movement = FollowingBuddy(ip=ip, port="9559")
+        
+        
 
 
     # CHATBOT LOGIC
     def search(self, text):
         self.tablet.search(text)
-        
+    
+    def follow(self):
+        self.movement.follow_user()
+
     def speak(self, prompt:str):
         
         self.chatbot.ask_pepper_to_speak(prompt)

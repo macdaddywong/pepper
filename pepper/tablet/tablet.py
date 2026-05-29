@@ -1,5 +1,6 @@
 import qi
 import sys
+import time
 import random
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -90,8 +91,74 @@ class Tablet:
             prompt=text
         ).strip()
         
-        
-    
+    def bootup(self, url:str="https://www.shutterstock.com/shutterstock/videos/3748476835/thumb/1.jpg?ip=x480",pick_random:bool=False):
+        # Connect to the robot
+        session = qi.Session()
+        if pick_random:
+            url = self.urls()
+        try:
+            session.connect("tcp://{}:{}".format(self.ip, str(self.port)))
+        except RuntimeError:
+            print("Cannot connect to Pepper at {}:{}".format(self.ip, self.port))
+            sys.exit(1)
+
+        try:
+            # Get the tablet service
+            
+            tablet = session.service("ALTabletService")
+
+            # Load the URL into the browser
+            tablet.loadUrl(url)
+
+            # Show the webview on the tablet
+            tablet.showWebview()
+
+            # Keep it displayed for 10 seconds
+            time.sleep(60)
+            tablet.loadUrl("https://www.shutterstock.com/shutterstock/videos/3748476835/thumb/1.jpg?ip=x480")
+            tablet.showWebview()
+            time.sleep(60)
+            tablet.loadUrl("https://workshopcoyote.wordpress.com/wp-content/uploads/2014/09/plankton-karen.png")
+            tablet.showWebview()
+            
+
+            # # Hide the webview when done
+            # tablet.hideWebview()
+
+        except Exception as e:
+            print("Error: {}".format(e))
+            
+    def set_tablet_page(self, url:str="https://www.shutterstock.com/shutterstock/videos/3748476835/thumb/1.jpg?ip=x480",pick_random:bool=False):
+        # Connect to the robot
+        session = qi.Session()
+        if pick_random:
+            url = self.urls()
+        try:
+            session.connect("tcp://{}:{}".format(self.ip, str(self.port)))
+        except RuntimeError:
+            print("Cannot connect to Pepper at {}:{}".format(self.ip, self.port))
+            sys.exit(1)
+
+        try:
+            # Get the tablet service
+            
+            tablet = session.service("ALTabletService")
+
+            # Load the URL into the browser
+            tablet.loadUrl(url)
+
+            # Show the webview on the tablet
+            tablet.showWebview()
+
+            # Keep it displayed for 10 seconds
+            # time.sleep(10)
+
+            # # Hide the webview when done
+            # tablet.hideWebview()
+
+        except Exception as e:
+            print("Error: {}".format(e))
+            
     def google_search(self, query):
         print("Now google searching...")
         # Connect to the robot
@@ -121,7 +188,14 @@ class Tablet:
 
         except Exception as e:
             print("Error: {}".format(e))
-    
+    def urls(self):
+        urls = [
+            "https://blenderartists.org/uploads/default/original/4X/8/1/5/815d22ef7c0faa66324d93fcab370de51ae7dda1.jpg",
+            "https://media.bizj.us/view/img/2859261/12543841h1458522*1200xx2358-2358-571-0.jpg",
+            "https://images.fastcompany.com/image/upload/f_webp,q_auto,c_fit/fc/3031538-poster-p-1-this-humanoid-robot-is-built-to-read-your-emotions.jpg"
+        ]
+        return random.choice(urls)
+
     def random_search(self):
        
         
@@ -129,7 +203,4 @@ class Tablet:
     
 
 if __name__ == "__main__":
-    t = Tablet()
-    t.main()
-    
-    main()
+    pass
