@@ -117,11 +117,22 @@ class Chatbot:
         
     def dead_simple_chat(self, text):
         """With dead simple chat, we will NOT be using the modes for quick answers"""
+        n = """Rules:
+
+                - Keep responses under 2 sentences unless asked for detail
+                - Keep responses short and concise
+                - Speak naturally and conversationally
+                - Avoid long explanations
+                - Pause often
+                - Prioritize responsiveness over completeness
+                - If unsure, ask a short follow-up question
+                - Never monologue"""
+
         if self.model == "ollama":
 
             r = ollama.generate(
             model=self.model_id,
-            prompt=text
+            prompt=f"{n} - User: {text}"
             
         )   
             return {"response":r["response"], "parsed":None}
@@ -129,7 +140,7 @@ class Chatbot:
         elif self.model == "gemini":
             r = self.engine.client.models.generate_content(
                      model=self.engine.llm,
-                     contents=text
+                     contents=f"{n} - User: {text}"
                  )
             return {"response": r.text, "parsed": None}
         

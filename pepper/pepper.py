@@ -1,8 +1,10 @@
 
 import sys
 from typing import Any, TYPE_CHECKING, List
+import subprocess
 import time
 from hearing.hearing import Hearing
+from tablet.tablet import Tablet
 from states.Currentstate import States
 if TYPE_CHECKING:
     from .AI.chatbot import Chatbot
@@ -11,21 +13,38 @@ if TYPE_CHECKING:
 
 class Pepper:
     def __init__(self, 
+                 ip,
                  classrooms:"Classrooms", 
                  memories:"Memory", 
                  chatbot:"Chatbot",
                  only_ears:bool=False):
+        
+        self.ip = ip
         self.classrooms = classrooms
         self.memories = memories
         self._only_ears_ = only_ears
         self.chatbot = chatbot
         self.ears = Hearing()
+        self.table_on:bool = False
         self.state = States.OFFLINE
+        self.tablet = Tablet(bot=chatbot)
+
 
     # CHATBOT LOGIC
+    def search(self, text):
+        self.tablet.search(text)
+        
     def speak(self, prompt:str):
         
         self.chatbot.ask_pepper_to_speak(prompt)
+        
+    def tablet_toggle(self):
+        if not self.table_on:
+            self.table_on = True
+            subprocess.run(["ssh", f"nao@{self.ip}", "qicli call ALTabletService._openSettings"])
+        else:
+            self.table_on = False
+            subprocess.run(["ssh", f"nao@{self.ip}", "qicli call ALTabletService._openSettings"])
 
     def wav_breakdown(self, path="wav/input.wav"):
         self.ears.wav_breakdown(path=path)
@@ -49,6 +68,7 @@ class Pepper:
                 action = self.chatbot.get_actions(action=new_mode)
                 self.chatbot.switch_first_mode(mode=action)
                 break
+            
     def change_second_mode_sequence(self):
         while True:
                     print(f"current mode: {self.chatbot.mode2}")
@@ -124,20 +144,20 @@ class Pepper:
     def _hear(self, speak:bool=True):
         try:
             while True:
-                print("=================================")
-                print("HEARING FOR USER INPUT TEST PHASE")
-                print("=================================\n")
+                # print("=================================")
+                # print("HEARING FOR USER INPUT TEST PHASE")
+                # print("=================================\n")
                 # keeping_going = input("keep going? (Y/N) ")
                 # if keeping_going.lower().strip() not in ["y", 'yes', "keep going"]:
                 #     break
-                time.sleep(1)
+                #time.sleep(1)
                 user = self.ears.listen_then_respond() 
                 if not user or user == "." or "%" in user:
                     print("Heard nothing, restarting loop")
                     continue
-                print(f"We were returned this as text:")
-                print("\n\t\u2022RAW:", user)
-                print("\n\t\u2022CLEAN:", self.ears.clean(user))
+                # print(f"We were returned this as text:")
+                # print("\n\t\u2022RAW:", user)
+                # print("\n\t\u2022CLEAN:", self.ears.clean(user))
                 # n = input("\nvalid? (Y/N/Q) ")
                 # n = n.lower().strip()
                 # if n in ['q', 'quit', 'break', 'b', '0', 'end', 'stop', 'finish', 'off']:
@@ -151,13 +171,13 @@ class Pepper:
                     print(f"Pepper return nothing for text, please double check on this issue: {pepper if pepper else 'Pepper said nothing'}")
                     break
                 response = pepper["response"]
-                parse = pepper["parsed"]
+                #parse = pepper["parsed"]
 
                 if speak:
                     self.chatbot.ask_pepper_to_speak(response)
 
                 print(f"[pepper]: \n\t\u2022{response}\n\n")
-                print(f"[pepper (parsed)]: \n\t\u2022{parse}")
+                #print(f"[pepper (parsed)]: \n\t\u2022{parse}")
         except Exception as ex:
             print(f"There was an error during hearing process: {ex}\n")
             input("please hit ENTER for knowledgement on the issue")
@@ -184,6 +204,9 @@ class Pepper:
                     continue
                 if user.lower() in ["mode", "change mode"]:
                     self.change_first_mode_sequence()
+                    continue
+                if user.lower().strip() in ["tablet", "toggle", "toggle tablet"]:
+                    self.tablet_toggle()
                     continue
 
                 if user.lower() in ["mode2", "mode 2", "change mode2", "change mode 2"]:
