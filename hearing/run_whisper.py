@@ -13,7 +13,7 @@ if __name__ == "__main__":
     #     exit(0)
         
     ears.turn_on_microphone()
-    text = ears.listen()
+    text = ears.wav_breakdown()
     print(f"We were returned this as text:")
     print("\n\t\u2022RAW:", text)
     print("\n\t\u2022CLEAN:", ears.clean(text))

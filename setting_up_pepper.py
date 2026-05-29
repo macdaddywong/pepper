@@ -8,7 +8,7 @@ from pepper.pepper import Pepper
 
 class1 = ["jhonny", "julius", "sophie", "rosa", "zoe", "jackie", "andrew"]
 
-def setup(ai:str="ollama", set_up_json:bool=False)->"Pepper":
+def setup(ai:str="ollama", set_up_json:bool=False, model_id:str="qwen2.5:3b")->"Pepper":
     gem_key = get_gemini_key()
     if ai == "gemini" and not gem_key:
         print("Gemini API key not found. Please set it in the .env file.")
@@ -16,7 +16,7 @@ def setup(ai:str="ollama", set_up_json:bool=False)->"Pepper":
     try:
         
         print(f"1. building bot...")
-        bot = Chatbot(model=ai, api_key=gem_key, mode="genius")
+        bot = Chatbot(model=ai, model_id=model_id, api_key=gem_key, mode="genius")
 
         print(f"2. building memory...")
         memory = Memory()
@@ -41,7 +41,7 @@ def setup(ai:str="ollama", set_up_json:bool=False)->"Pepper":
 
 
 if __name__ == "__main__":
-    pepper:"Pepper" = setup(ai="ollama")
+    pepper:"Pepper" = setup(ai="ollama", model_id="qwen3:0.6b")
     if not pepper:
         exit(0)
     #pepper.add_class(1, list_of_students=class1)

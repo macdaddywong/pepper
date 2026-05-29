@@ -27,8 +27,8 @@ class Pepper:
         
         self.chatbot.ask_pepper_to_speak(prompt)
 
-    def listen(self, path="wav/input.wav"):
-        self.ears.listen(path=path)
+    def wav_breakdown(self, path="wav/input.wav"):
+        self.ears.wav_breakdown(path=path)
         
     def chat(self,prompt:str):
         self.chatbot.simple_chat(prompt)
@@ -103,31 +103,50 @@ class Pepper:
 
     def change_language(self, language:str):
         self.chatbot.change_language(language)
-
+        
+    def vaild_whisper(self, text:str):
+        text = text.lower().strip()
+        invaild =  [
+            ".",
+            '%'
+        ]
+        
+        if text == "" or not text:
+            return False
+        
+        if "%" in text:
+            return False
+        
+        if text == any(i for i in invaild):
+            return False
+        return True
+        
     def _hear(self, speak:bool=True):
         try:
             while True:
                 print("=================================")
                 print("HEARING FOR USER INPUT TEST PHASE")
                 print("=================================\n")
-                keeping_going = input("keep going? (Y/N) ")
-                if keeping_going.lower().strip() not in ["y", 'yes', "keep going"]:
-                    break
-                
-                self.ears.turn_on_microphone()
-                user = self.ears.listen() 
-                if not user or user == ".":
+                # keeping_going = input("keep going? (Y/N) ")
+                # if keeping_going.lower().strip() not in ["y", 'yes', "keep going"]:
+                #     break
+                time.sleep(1)
+                user = self.ears.listen_then_respond() 
+                if not user or user == "." or "%" in user:
                     print("Heard nothing, restarting loop")
                     continue
                 print(f"We were returned this as text:")
                 print("\n\t\u2022RAW:", user)
                 print("\n\t\u2022CLEAN:", self.ears.clean(user))
-                n = input("valid? (Y/N) ")
+                # n = input("\nvalid? (Y/N/Q) ")
+                # n = n.lower().strip()
+                # if n in ['q', 'quit', 'break', 'b', '0', 'end', 'stop', 'finish', 'off']:
+                #     exit(self.exit_text())
+                # if n not in ['y', 'yes', 'yy','1']:
+                #     continue
                 
-                if n.lower().strip() not in ['y', 'yes']:
-                    exit(0)
-                    
-                pepper = self.chatbot.simple_chat(user)
+                #time.sleep(1)
+                pepper = self.chatbot.dead_simple_chat(user)
                 if not pepper:
                     print(f"Pepper return nothing for text, please double check on this issue: {pepper if pepper else 'Pepper said nothing'}")
                     break

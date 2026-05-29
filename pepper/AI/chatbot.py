@@ -115,6 +115,26 @@ class Chatbot:
             response = {"response": "No valid model found", "parsed": None}
     
         
+    def dead_simple_chat(self, text):
+        """With dead simple chat, we will NOT be using the modes for quick answers"""
+        if self.model == "ollama":
+
+            r = ollama.generate(
+            model=self.model_id,
+            prompt=text
+            
+        )   
+            return {"response":r["response"], "parsed":None}
+        
+        elif self.model == "gemini":
+            r = self.engine.client.models.generate_content(
+                     model=self.engine.llm,
+                     contents=text
+                 )
+            return {"response": r.text, "parsed": None}
+        
+        else:             
+            r = {"response": "No valid model found", "parsed": None}
     
     def validate_mode(self, new_mode:str)->bool:
         if new_mode not in self.valid_modes():
