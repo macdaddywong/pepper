@@ -38,11 +38,15 @@ def setup(ip:str,ai:str="ollama", set_up_json:bool=False, model_id:str="qwen2.5:
         print(f"ERRORS detected: {ex}")
         input("press ENTER knowledgement on the issue...")
         
-
+def activate(self,force:str="on"):
+    use_ears_or_not = input("Use ears? (Y/N): ").strip().lower() in ["y", "yes", "1", "true"]
+    begin_searches = input("Use google searching? (Y/N): ").strip().lower() in ["y", "yes", "1", "true"]
+    make_summary = input("Use google searching? (Y/N): ").strip().lower() in ["y", "yes", "1", "true"]
 
 if __name__ == "__main__":
     use_ears_or_not = input("Use ears? (Y/N): ").strip().lower() in ["y", "yes", "1", "true"]
-
+    begin_searches = input("Use google searching? (Y/N): ").strip().lower() in ["y", "yes", "1", "true"]
+    
     pepper:"Pepper" = setup(ip="172.17.10.113", ai="ollama", model_id="qwen3:0.6b")
     if not pepper:
         print("Pepper failed to build, ending now...")
@@ -50,6 +54,6 @@ if __name__ == "__main__":
     #pepper.add_class(1, list_of_students=class1)
     pepper.tablet_toggle()
     
-    pepper.active(use_ears=use_ears_or_not)
+    pepper.active(use_ears=use_ears_or_not, search=begin_searches, make_summary=False)
 
 

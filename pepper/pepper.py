@@ -4,7 +4,7 @@ from typing import Any, TYPE_CHECKING, List
 import subprocess
 import time
 from hearing.hearing import Hearing
-from tablet.tablet import Tablet
+from .tablet.tablet import Tablet
 from states.Currentstate import States
 if TYPE_CHECKING:
     from .AI.chatbot import Chatbot
@@ -166,6 +166,7 @@ class Pepper:
                 #     continue
                 
                 #time.sleep(1)
+                self.search(user)
                 pepper = self.chatbot.dead_simple_chat(user)
                 if not pepper:
                     print(f"Pepper return nothing for text, please double check on this issue: {pepper if pepper else 'Pepper said nothing'}")
@@ -183,10 +184,13 @@ class Pepper:
             input("please hit ENTER for knowledgement on the issue")
             return
         
-    def active(self, speak:bool=True, use_ears:bool=False):
+    def active(self, speak:bool=True, use_ears:bool=False, search:bool=False,response_strength:int=1, make_summary:bool=True):
         """The loop of pepper being active"""
-        
+        response_strength = 2 if response_strength > 2 else 1
+       
+        summary_broke:bool = False
         self.state = States.ONLINE
+        strength = str(response_strength)
         if self._only_ears_ or use_ears:
             self._hear(speak=speak)
             self.exit_text()
@@ -202,37 +206,75 @@ class Pepper:
                 if user.lower() in ["see modes", "see mode"]:
                     self.see_modes()
                     continue
+                
                 if user.lower() in ["mode", "change mode"]:
                     self.change_first_mode_sequence()
                     continue
+                
                 if user.lower().strip() in ["tablet", "toggle", "toggle tablet"]:
                     self.tablet_toggle()
                     continue
-
+                
+                if user.lower().strip() in ["language", "change language"]:
+                    continue
+                
+                if user.lower() in ["search", 'google', 'google search']:
+                    while True:
+                        searching = input("search (q to quit): ")
+                        if searching.lower() in ["q", "quit",]:
+                            break
+                        self.tablet.google_search(searching)
+                        
+                        continue
+                    continue
+                        
                 if user.lower() in ["mode2", "mode 2", "change mode2", "change mode 2"]:
                     self.change_second_mode_sequence()
                     continue
                 if not user:
                     continue
                 print("GETTING CHAT...")
-                pepper = self.chatbot.simple_chat(user)
+                chats = {
+                    "1": self.chatbot.dead_simple_chat,
+                    "2": self.chatbot.simple_chat,
+                   # "3": self.chatbot.chat
+                }
+           
+                pepper = chats[strength](user)
+                if not pepper:
+                    print("Pepper didnt send any response, please double check")
+                    exit(self.exit_text())
+                    
                 response = pepper["response"]
                 parse = pepper["parsed"]
 
                 if speak:
+                    
                     self.chatbot.ask_pepper_to_speak(response)
+                print("SEARCHING INSIDE def active()")
+                if search:
+                    self.search(user)
+
 
                 print(f"[pepper]: \n\t\u2022{response}\n\n")
-                print(f"[pepper (parsed)]: \n\t\u2022{parse}")
+                #print(f"[pepper (parsed)]: \n\t\u2022{parse}")
 
-                print("creating summary...")
-                summary = self.chatbot.summary_of_chat({"user":user, "response": response})
-
-                print(f"summary: {summary['summary']}\n")
-                print("adding summary to memory")
-                self.memories.add_to_chat_history(summary['summary'])
-                print("memory process done, saving changes")
-                self.commit()
+                if make_summary:
+                    if not summary_broke:
+                        print("creating summary...")
+                        summary = self.chatbot.summary_of_chat({"user":user, "response": response})
+                    else:
+                        continue
+                    if not summary:
+                        summary_broke = True
+                        print("Summary process broke somewhere, continuing loop")
+                        continue
+                    print(f"summary: {summary['summary']}\n")
+                    print("adding summary to memory")
+                    self.memories.add_to_chat_history(summary['summary'])
+                    print("memory process done, saving changes")
+                    self.commit()
+                continue
 
         except Exception as ex:
             print(f"ERROR: \n\t\u2022{ex}")

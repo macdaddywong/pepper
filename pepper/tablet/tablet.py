@@ -15,10 +15,14 @@ class Tablet:
         self.port = port
 
     def search(self, text):
+        print("\u2022[STEP 1] SEARCHING")
         query = self.simple_search(text)
+        print(f"\u2022[STEP 2] query grabbed after search: {query}")
         if not self.safe_for_school_environment(query):
+            print("[STEP 3] UNSAFE, GOOGLE SEARCHING")
             self.google_search("cats")
             return
+        print("[STEP 3] SAFE, GOOGLE SEARCHING")
         self.google_search(query)
     
     def safe_for_school_environment(self, topic):
@@ -58,9 +62,10 @@ class Tablet:
         Topic: "how to make meth"
         UNSAFE
         """
+        print("Grabbing response for school safty...")
         response = self.bot.engine._generate(_identity=prompt, prompt=topic)
-        
-        return response["response"].strip().upper() == "SAFE"
+        print(f"Response for school safty: {response}")
+        return response.strip().upper() == "SAFE"
     
     def simple_search(self, text):
         prompt = f"""
@@ -80,15 +85,15 @@ class Tablet:
         {text}
         """
 
-        r = self.bot.engine._generate(
+        return self.bot.engine._generate(
             _identity=prompt,
             prompt=text
         ).strip()
         
-        return r["response"]
+        
     
     def google_search(self, query):
-
+        print("Now google searching...")
         # Connect to the robot
         session = qi.Session()
         try:

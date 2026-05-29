@@ -297,6 +297,7 @@ class Engine:
         ]
 
         # GEMINI BRANCH
+        
         if self.backend == 'gemini' and not _use_ollama:
             try:
                 from google.genai import types
@@ -356,12 +357,14 @@ class Engine:
         else:
             # OLLAMA
             try:
+             
                 client = ollama.Client(timeout=60.0)
 
                 if send_json:
                     messages[0]['content'] += (
                         "\nRespond ONLY with valid JSON."
                     )
+                    print("Sending JSON")
                 
                 kwargs = {
                     'model': self.ollama_model,
@@ -370,6 +373,7 @@ class Engine:
                         'temperature': 0.2
                     }
                 }
+            
 
                 if send_json:
                     kwargs['format'] = 'json'
@@ -377,10 +381,11 @@ class Engine:
                 response = client.chat(**kwargs)
 
                 content = response['message']['content']
-
+                print("Response and content are created successfully")
                 if send_json:
+                
                     return self._parse_json(content, default={})
-
+                print(f'\n\n\t\u2022CONTENT: {content}')
                 return content
 
             except Exception as e:
